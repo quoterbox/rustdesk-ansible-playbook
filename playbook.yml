@@ -1,0 +1,9 @@
+---
+- name: "Setup RustDesk on the remote server"
+  hosts: www
+  become: yes
+  user: "{{ root_user }}"
+  vars_files:
+    - group_vars/main.yml
+  roles:
+    - { role: roles-ansible.rustdesk }

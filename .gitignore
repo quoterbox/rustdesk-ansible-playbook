@@ -1,0 +1,11 @@
+# gitignore
+hosts.ini
+.idea/
+.env
+.env.php
+*.env.php
+*.key
+vendor
+/var
+/node_modules
+/group_vars/main.yml

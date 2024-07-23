@@ -1,0 +1,41 @@
+---
+- name: "Revert SSH configuration changes on localhost for the {{ localhost_user }}"
+  hosts: localhost
+  connection: local
+  become: yes
+  vars_files:
+    - ../group_vars/main.yml
+  tasks:
+    - name: "Get user information"
+      ansible.builtin.user:
+        name: "{{ localhost_user }}"
+      register: user_info
+
+    - name: "Ensure .ssh directory exists"
+      ansible.builtin.file:
+        path: "{{ user_info.home }}/.ssh"
+        state: directory
+        mode: 0700
+
+    - name: "Remove SSH configuration for the {{ localhost_user }}"
+      ansible.builtin.blockinfile:
+        path: "{{ user_info.home }}/.ssh/config"
+        state: absent
+        marker: "# {mark} ANSIBLE MANAGED BLOCK - {{ server_name }}"
+
+    - name: "Remove public and private keys for the remote server"
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - "{{ user_info.home }}/{{ root_private_key_file }}"
+        - "{{ user_info.home }}/{{ root_public_key_file }}"
+
+    - name: "Check if known_hosts file exists"
+      stat:
+        path: "{{ user_info.home }}/.ssh/known_hosts"
+      register: known_hosts_file
+
+    - name: "Remove server from known_hosts for {{ remote_host }}"
+      ansible.builtin.shell: "ssh-keygen -R {{ remote_host }} -f {{ user_info.home }}/.ssh/known_hosts"
+      when: known_hosts_file.stat.exists

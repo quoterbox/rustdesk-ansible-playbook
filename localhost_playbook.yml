@@ -1,0 +1,62 @@
+---
+- name: "Generate SSH keys on the localhost for the {{ localhost_user }}"
+  hosts: localhost
+  connection: local
+  become: yes
+  vars_files:
+    - group_vars/main.yml
+  tasks:
+    - name: "Get user information"
+      ansible.builtin.user:
+        name: "{{ localhost_user }}"
+      register: user_info
+
+    - name: "Ensure .ssh directory exists for the {{ localhost_user }}"
+      ansible.builtin.file:
+        path: "{{ user_info.home }}/.ssh"
+        state: directory
+        owner: "{{ localhost_user }}"
+        group: "{{ localhost_user }}"
+        mode: 0700
+
+    - name: "Generate SSH key for the {{ localhost_user }}"
+      ansible.builtin.user:
+        name: "{{localhost_user}}"
+        generate_ssh_key: yes
+        ssh_key_type: rsa
+        ssh_key_bits: 2048
+        ssh_key_file: "{{ user_info.home }}/{{ root_private_key_file }}"
+
+    - name: "Ensure correct permissions for the private key"
+      ansible.builtin.file:
+        path: "{{ user_info.home }}/{{ root_private_key_file }}"
+        state: file
+        mode: 0600
+        owner: "{{ localhost_user }}"
+        group: "{{ localhost_user }}"
+
+    - name: "Ensure correct permissions for the public key"
+      ansible.builtin.file:
+        path: "{{ user_info.home }}/{{ root_public_key_file }}"
+        state: file
+        mode: 0644
+        owner: "{{ localhost_user }}"
+        group: "{{ localhost_user }}"
+
+    - name: "Add SSH configuration for {{ remote_host }} and user {{ root_user }}"
+      ansible.builtin.blockinfile:
+        path: "{{ user_info.home }}/{{ config_file }}"
+        create: yes
+        block: |
+          Host {{ remote_host }}
+          User {{ root_user }}
+          IdentityFile {{ user_info.home }}/{{ root_private_key_file }}
+        marker: "# {mark} ANSIBLE MANAGED BLOCK - {{ server_name }}"
+
+    - name: "Add a blank line for separation"
+      ansible.builtin.lineinfile:
+        path: "{{ user_info.home }}/{{ config_file }}"
+        state: present
+        create: yes
+        line: ""
+        insertafter: EOF
