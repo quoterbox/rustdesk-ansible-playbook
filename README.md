@@ -5,7 +5,7 @@
 ### Quick Start
 1.Clone the repository to your local machine, for example in **HOME/YOUR_USER/ansible-project/**
 
-```git clone git@github.com:quoterbox/wireguard-via-ansible-playbook.git ansible-project```
+```git clone git@github.com:quoterbox/rustdesk-ansible-playbook.git ansible-project```
 
 2.Specify the IP address of your server in the **hosts.ini** IP file under the **[www]**:  
 ```
@@ -30,15 +30,15 @@ remote_host: "111.111.111.111"
 4.Create SSH key files on your local computer by running the first local playbook from the playbook folder
 **HOME/YOUR_USER/ansible-project/**:
 
-```ansible-playbook -i hosts.ini localhost_playbook.yml --ask-become-pass```
+```ansible-playbook -i hosts.ini localhost_playbook.yml```
 
 5.If the keys are successfully created, they will appear by default in the `~/.ssh/` folder
 
 6.Copy the public key to the remote server, replacing the IP address in the command with your server's IP address:
 
-```ssh-copy-id -i ~/.ssh/root_wg_server root@111.111.111.111```
+```ssh-copy-id -i ~/.ssh/root_rustdesk_server root@111.111.111.111```
 
-In this command, `~/.ssh/root_wg_server` is used if you kept the default settings
+In this command, `~/.ssh/root_rustdesk_server` is used if you kept the default settings
 
 7.Enter the root user password when prompted in the terminal to confirm the copying of the SSH keys
 8.To verify that the keys have been successfully copied, try logging into the server without a password using the command:
@@ -60,6 +60,20 @@ In this command, `~/.ssh/root_wg_server` is used if you kept the default setting
 - Key
 
 ![desktop_network_settings.png](docs/desktop_network_settings.png)
+
+
+## Rollback playbook
+
+There's an option to roll back all changes on the server and the local machine.
+
+1. To roll back changes on the server, run the playbook:
+
+```ansible-playbook -i hosts.ini rollback/playbook.yml```
+
+2. To roll back changes on the local machine(from which the remote server is being configured), run the playbook:
+
+```ansible-playbook -i hosts.ini rollback/localhost_playbook.yml```
+
 
 ## Possible Issues
 
@@ -83,6 +97,7 @@ or
 
 5. Ensure that you copied the **Key** correctly without newline characters `\n`
 6. If connection fails, try using the server's IP address instead of the domain.
+7. If connection fails, try using the Relay Server connection in the RustDesk application.
 
 ### RustDesk's documentation 
 

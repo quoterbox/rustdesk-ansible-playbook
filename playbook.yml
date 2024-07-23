@@ -1,4 +1,29 @@
 ---
+- name: "Ensure unzip is installed"
+  hosts: www
+  become: yes
+  tasks:
+    - name: "Update package lists"
+      ansible.builtin.apt:
+        update_cache: yes
+
+    - name: "Upgrade all packages"
+      ansible.builtin.apt:
+        upgrade: dist
+
+    - name: "Gather package facts"
+      ansible.builtin.package_facts:
+
+    - name: "Check if unzip is installed"
+      set_fact:
+        unzip_installed: "{{ 'unzip' in ansible_facts.packages }}"
+
+    - name: "Install unzip if not present"
+      ansible.builtin.apt:
+        name: unzip
+        state: present
+      when: not unzip_installed
+
 - name: "Setup RustDesk on the remote server"
   hosts: www
   become: yes

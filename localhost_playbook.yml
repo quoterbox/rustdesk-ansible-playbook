@@ -2,7 +2,7 @@
 - name: "Generate SSH keys on the localhost for the {{ localhost_user }}"
   hosts: localhost
   connection: local
-  become: yes
+  user: "{{ localhost_user }}"
   vars_files:
     - group_vars/main.yml
   tasks:

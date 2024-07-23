@@ -1,0 +1,85 @@
+---
+- name: "Rollback RustDesk server setup"
+  hosts: www
+  become: yes
+  vars_files:
+    - ../group_vars/main.yml
+  tasks:
+    - name: "Gather service facts"
+      ansible.builtin.service_facts:
+
+    - name: "Check if rustdesk-hbbr service exists"
+      set_fact:
+        hbbr_service_exists: "{{ 'rustdesk-hbbr.service' in ansible_facts.services }}"
+
+    - name: "Stop and disable rustdesk-hbbr service"
+      ansible.builtin.systemd:
+        name: "rustdesk-hbbr"
+        state: stopped
+        enabled: no
+      when: hbbr_service_exists
+      ignore_errors: true
+
+    - name: "Check if rustdesk-hbbs service exists"
+      set_fact:
+        hbbs_service_exists: "{{ 'rustdesk-hbbs.service' in ansible_facts.services }}"
+
+    - name: "Stop and disable rustdesk-hbbs service"
+      ansible.builtin.systemd:
+        name: "rustdesk-hbbs"
+        state: stopped
+        enabled: no
+      when: hbbs_service_exists
+      ignore_errors: true
+
+    - name: "Remove rustdesk-hbbr service file"
+      ansible.builtin.file:
+        path: "/lib/systemd/system/rustdesk-hbbr.service"
+        state: absent
+      ignore_errors: true
+
+    - name: "Remove rustdesk-hbbs service file"
+      ansible.builtin.file:
+        path: "/lib/systemd/system/rustdesk-hbbs.service"
+        state: absent
+      ignore_errors: true
+
+    - name: "Reload systemd to apply changes"
+      ansible.builtin.systemd:
+        daemon_reload: true
+      ignore_errors: true
+
+    - name: "Remove hbbr binary"
+      ansible.builtin.file:
+        path: "{{ rustdesk__hbbr_executable_path }}"
+        state: absent
+      ignore_errors: true
+
+    - name: "Remove hbbs binary"
+      ansible.builtin.file:
+        path: "{{ rustdesk__hbbs_executable_path }}"
+        state: absent
+      ignore_errors: true
+
+    - name: "Remove rustdesk-utils binary"
+      ansible.builtin.file:
+        path: "{{ rustdesk__rustdesk_utils_executable_path }}"
+        state: absent
+      ignore_errors: true
+
+    - name: "Remove RustDesk configuration directory"
+      ansible.builtin.file:
+        path: "{{ rustdesk__home }}"
+        state: absent
+
+    - name: "Remove RustDesk user"
+      ansible.builtin.user:
+        name: "{{ rustdesk__user }}"
+        state: absent
+      ignore_errors: true
+
+    - name: "Remove RustDesk group"
+      ansible.builtin.group:
+        name: "{{ rustdesk__user }}"
+        state: absent
+      ignore_errors: true

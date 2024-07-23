@@ -3,9 +3,9 @@
 ### [EN documentation](README.md)
 
 ### Быстрый старт
-1.Склонируйте себе репозиторий, например в **HOME/ВАШ_ПОЛЬЗОВАТЕЛЬ/ansible-project/**
+1.Склонируйте себе репозиторий, например, в **HOME/ВАШ_ПОЛЬЗОВАТЕЛЬ/ansible-project/**
 
-```git clone git@github.com:quoterbox/wireguard-via-ansible-playbook.git ansible-project```
+```git clone git@github.com:quoterbox/rustdesk-ansible-playbook.git ansible-project```
 
 2.Укажите в файле **hosts.ini** IP адрес своего сервера в блоке **[www]**:  
 ```
@@ -30,15 +30,15 @@ remote_host: "111.111.111.111"
 7.Создаем на локальном компьютере файлы SSH ключей, запуская первый локальный плейбук из папки с плейбуками 
 **HOME/ВАШ_ПОЛЬЗОВАТЕЛЬ/ansible-project/**:
 
-```ansible-playbook -i hosts.ini localhost_playbook.yml --ask-become-pass```
+```ansible-playbook -i hosts.ini localhost_playbook.yml```
 
 8.Если ключи успешно созданы, то они появятся по умолчанию в папке `~/.ssh/`
 
 9.Копируем публичный ключ на удаленный сервер, не забывая заменить IP адрес в команде на IP своего сервера:
 
-```ssh-copy-id -i ~/.ssh/root_wg_server root@111.111.111.111```
+```ssh-copy-id -i ~/.ssh/root_rustdesk_server root@111.111.111.111```
 
-В данной команде `~/.ssh/root_wg_server` - если вы оставили настройки по умолчанию
+В данной команде `~/.ssh/root_rustdesk_server` - если вы оставили настройки по умолчанию
 
 10.Вводим пароль от root пользователя при запросе в терминале, чтобы подтвердить копирование SSH ключей
 11.Чтобы проверить, что ключи успешно скопированы, пробуем зайти на сервер без пароля с помощью команды:
@@ -60,6 +60,17 @@ remote_host: "111.111.111.111"
 - Key
 
 ![desktop_network_settings.png](docs/desktop_network_settings.png)
+
+## Откат внесенных изменений
+Вы можете откатить все изменения на сервере и локальной машине с помощью плейбуков в директории `rollback/`. 
+
+1. Чтобы откатить изменения на сервере, запустите этот плейбук:
+
+```ansible-playbook -i hosts.ini rollback/playbook.yml```
+
+2. Чтобы откатить изменения на локальной машине (с которой идет настройка удаленного сервера), запустите этот плейбук:
+
+```ansible-playbook -i hosts.ini rollback/localhost_playbook.yml```
 
 ## Возможные проблемы
 
@@ -83,7 +94,7 @@ remote_host: "111.111.111.111"
 
 5. Убедитесь, что вы верно скопировали ключ **Key** без символов переноса строки `\n`
 6. Если подключиться не удается, попробуйте указать вместо домена просто IP адрес своего сервера.
-
+7. Если подключиться не удается, попробуйте использовать Relay Server connection в самом приложении RustDesk.
 
 ### Официальная документация RustDesk
 
