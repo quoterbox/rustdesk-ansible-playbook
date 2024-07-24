@@ -2,6 +2,10 @@
 
 ### [EN documentation](README.md)
 
+### Видеоинструкция (актуальная документация всегда в README репозитория)
+
+https://www.youtube.com/watch?v=d4XfTvvekoM
+
 ### Быстрый старт
 1.Склонируйте себе репозиторий, например, в **HOME/ВАШ_ПОЛЬЗОВАТЕЛЬ/ansible-project/**
 

@@ -2,6 +2,10 @@
 
 ### [RU documentation](README_RU.md)
 
+### Video instruction (the up-to-date documentation is always in the repository's README.)
+
+https://www.youtube.com/watch?v=d4XfTvvekoM
+
 ### Quick Start
 1.Clone the repository to your local machine, for example in **HOME/YOUR_USER/ansible-project/**
 
